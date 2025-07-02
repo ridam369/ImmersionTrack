@@ -92,9 +92,11 @@ Sat █ █ █ █ █ ▓ █ █ ▒ ▓ █ ▓ ▒ █ █ █ ▒ ▓ ▓ 
 ```
 
 📊 Immersion Summary:
+```bash
 🗓️  Weekly Total: 280 mins over 4 day(s) (avg: 70.0 mins/day)
 📅 Monthly Total: 0 mins over 0 day(s) (avg: 0.0 mins/day)
 🏆 Best Day: 2024-07-21 — 175 mins
+```
 
 💾 Backups
 
