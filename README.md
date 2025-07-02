@@ -38,28 +38,28 @@ Date,Video,Time
 ```bash
 git clone https://github.com/ridam369/ImmersionTrack.git
 cd ImmersionTrack
-
+```
 2. Install Dependencies
 
 Only required dependency:
-
+```bash
 pip install pandas plotext
-
-    plotext is used to draw terminal-based charts.
+```
+plotext is used to draw terminal-based charts.
 
 3. Run the Tracker
-
+```bash
 python3 immersiontrack.py
-
+```
 4. Menu Options
-
+```bash
 === Immersion Tracker ===
 1. View Chart        → View 30-day bar chart
 2. Add Entry         → Add a new immersion session
 3. Delete Entry      → Delete today's entry
 4. Stats             → Weekly and monthly summaries
 5. Exit              → Quit the tracker
-
+```
 📈 Visualizations
 
 📅 Yearly Immersion Heatmap
