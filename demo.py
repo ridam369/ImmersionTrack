@@ -60,7 +60,7 @@ def visualize(df):
     col_width = max(3, max_min_len + 1)
 
     # Print bars vertically
-    print("\n📊 30-Day Immersion History (Anki-style)\n")
+    print("\n📊 30-Day History\n")
     for level in range(max_height, 0, -1):
         for h in heights:
             block = "█" if h >= level else " "
@@ -152,7 +152,8 @@ def menu():
         print("2. Add Entry")
         print("3. Delete Entry")
         print("4. Stats")
-        print("5. Exit")
+        print("5. View Log by Date")
+        print("6. Exit")
         choice = input("Choose an option: ").strip()
 
         if choice == '1':
@@ -169,6 +170,8 @@ def menu():
             show_summary()
             show_yearly_ascii_heatmap()
         elif choice =='5':
+            show_log_by_date()
+        elif choice =='6':
             break
         else:
             print("Invalid option.")
@@ -241,71 +244,98 @@ def show_yearly_ascii_heatmap():
     # Aggregate total minutes per date
     totals = df.groupby(df['Date'].dt.date)['Minutes'].sum()
 
-    today = datetime.today().date()
-    start_date = today - timedelta(days=364)  # ~52 weeks
+    latest_date = df['Date'].max().date()
+    # Align end date (latest date) to the upcoming Saturday (so the grid ends cleanly)
+    end_date = latest_date + timedelta(days=(6 - latest_date.weekday()) % 7)
+    start_date = end_date - timedelta(weeks=52) + timedelta(days=1)
 
-    # Align start_date to previous Sunday (GitHub style)
-    start_date -= timedelta(days=(start_date.weekday() + 1) % 7)
-
-    # Build all dates for 52 weeks
-    all_dates = [start_date + timedelta(days=i) for i in range(52 * 7)]
+    all_dates = [start_date + timedelta(days=i) for i in range((end_date - start_date).days + 1)]
     heatmap_data = {date: totals.get(date, 0) for date in all_dates}
 
     def block(minutes):
-        global goal
         if minutes == 0:
             return ' '
-        elif minutes < goal/4:
+        elif minutes < goal / 4:
             return '░'
-        elif minutes < goal/2:
+        elif minutes < goal / 2:
             return '▒'
         elif minutes < goal:
             return '▓'
         else:
             return '█'
 
-    # Build rows for each day of the week (Sun to Sat)
-    rows = [[] for _ in range(7)]
-    for day_of_week in range(7):
-        for week in range(52):
-            date = start_date + timedelta(days=week * 7 + day_of_week)
+    # Build grid: rows[day][week]
+    rows = [[] for _ in range(7)]  # Sun to Sat
+    weeks = (end_date - start_date).days // 7
+    for week in range(weeks + 1):
+        for day in range(7):
+            date = start_date + timedelta(days=week * 7 + day)
+            if date > end_date:
+                continue
             val = heatmap_data.get(date, 0)
             cell = block(val)
-            if date == today:
+            if date == datetime.today().date():
                 cell = f"*{cell}*"
-            rows[day_of_week].append(cell)
+            rows[day].append(cell)
 
+    # Print day labels + grid
     days_header = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]
     print("\n📅 Yearly Heatmap\n")
-
-    # Print heatmap grid with weekday labels
     for i, day in enumerate(days_header):
         print(f"{day:>3} ", end='')
         print(' '.join(rows[i]))
 
-    # --- Print corrected month labels ---
-    # Detect first day of each month in all_dates
+    # Print month labels
+    print("\n    ", end='')
     month_positions = {}
     for i, date in enumerate(all_dates):
         if date.day == 1:
             week_index = (date - start_date).days // 7
-            if week_index not in month_positions:
-                month_positions[week_index] = calendar.month_abbr[date.month]
+            month_positions[week_index] = calendar.month_abbr[date.month]
 
-    # Print month names spaced under the right weeks
-    print("\n    ", end='')  # padding for weekday labels
-    last_week = 0
-    for week in sorted(month_positions.keys()):
-        spaces = (week - last_week) * 2  # 2 spaces per week
-        print(' ' * spaces + month_positions[week], end='')
-        last_week = week + len(month_positions[week]) // 2
+    last_pos = 0
+    for week, month in sorted(month_positions.items()):
+        spaces = (week - last_pos) * 2
+        print(' ' * spaces + month, end='')
+        last_pos = week + len(month) // 2
     print("\n")
 
+
+
+def show_log_by_date():
+    df = load_data()
+    if df.empty:
+        print("No immersion data found.")
+        return
+
+    date_input = input("Enter date (YYYY-MM-DD) (default = today): ").strip()
+
+    if not date_input:
+        date_str = datetime.today().strftime('%Y-%m-%d')
+    elif date_input.lower() == "all":
+        print("\n📜 All Immersion Logs:\n")
+        print(df.to_string(index=False))
+        return
+    else:
+        try:
+            datetime.strptime(date_input, '%Y-%m-%d')
+            date_str = date_input
+        except ValueError:
+            print("❌ Invalid date format. Use YYYY-MM-DD.")
+            return
+
+    logs = df[df['Date'] == date_str]
+    
+    if logs.empty:
+        print(f"ℹ️  No entries found for {date_str}.")
+    else:
+        print(f"\n📅 Log for {date_str}:\n")
+        for idx, row in logs.iterrows():
+            print(f"🎬 {row['Video']} — ⏱ {row['Time']}")
 
 
 if __name__ == "__main__":
     goal = 60 # set your daily goal in minutes
     menu()
     
-
 
