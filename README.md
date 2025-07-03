@@ -14,6 +14,20 @@
 - 🧠 Designed for terminal lovers and productivity nerds.
 
 ---
+## 📽️ Demo
+
+To explore the features of this immersion tracker without entering your own data:
+1. Run the demo script:
+```bash
+python demo.py
+```
+2. What it does:
+
+    Loads pre-filled immersion data from demo_data.csv
+
+    Displays all visualizations (heatmap, Anki-style chart, stats, etc.)
+
+    Lets you navigate the full menu and test the app interactively
 
 ## 📂 File Format
 
@@ -22,7 +36,11 @@ The data is stored in a simple CSV file called `immersion.csv`.
 ### CSV Structure:
 
 Date,Video,Time
+
+Example:
+
 2025-06-01,Shingeki no Kyojin Episode 1,00:45
+
 2025-06-02,Nihongo no Mori - N4 Grammar,00:30
 
 - `Date` – In `YYYY-MM-DD` format.
