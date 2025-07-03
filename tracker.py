@@ -99,8 +99,7 @@ def append_entry():
         date = datetime.today().strftime('%Y-%m-%d')
     else:
         try:
-            datetime.strptime(date_input, '%Y-%m-%d')
-            date = date_input
+            datetime.strptime(date, '%Y-%m-%d')
         except ValueError:
             print("❌ Invalid date format. Use YYYY-MM-DD.")
             return
@@ -307,3 +306,4 @@ def show_yearly_ascii_heatmap():
 if __name__ == "__main__":
     goal = 60 # set your daily goal in minutes
     menu()
+    
